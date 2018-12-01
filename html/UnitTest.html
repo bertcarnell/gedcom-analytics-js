@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+Copyright 2015 Robert Carnell
+See the included LICENSE file for licensing details
+-->
+<html>
+  <head>
+    <title>GEDCOM-analytics-js Unit Tests</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../js/lib/prototype.js"></script>
+    <script type="text/javascript" src="../js/GedcomParser.js"></script>
+    <script type="text/javascript" src="../js/Tree.js"></script>
+    <script>
+      var assert = function(statement, divElement, testLabel)
+      {
+        if (document.getElementById(divElement) == null)
+        {
+          // TODO: figure out how to alert that the div is missing for the unit test
+        }
+        if (statement)
+        {
+          document.getElementById(divElement).innerHTML = testLabel + ": Success";
+          document.getElementById(divElement).style.color = "white";
+          document.getElementById(divElement).style.backgroundColor = "green";
+        }
+        else
+        {
+          document.getElementById(divElement).innerHTML = testLabel + ": Failure";
+          document.getElementById(divElement).style.color = "white";
+          document.getElementById(divElement).style.backgroundColor = "red";
+        }
+      };
+    </script>
+</head>
+  <body>
+    <h1>Unit Tests</h1>
+    <div id="UnitTest1"></div>
+    <div id="UnitTest2"></div>
+    <div id="UnitTest3"></div>
+    <div id="UnitTest4"></div>
+    <div id="UnitTest5"></div>
+    <div id="UnitTest6"></div>
+    <div id="UnitTest7"></div>
+    <div id="UnitTest8"></div>
+    <div id="UnitTest9"></div>
+    <div id="UnitTest10"></div>
+    <div id="UnitTest11"></div>
+    <div id="UnitTest12"></div>
+    <script>
+      /* define global variables from other scripts for JSLint */
+      /*global GedcomAnalytics*/
+
+      var result = {};
+      /*
+       * splitLine 
+   *   */
+      result = GedcomAnalytics.GedcomParser.splitLine("1 NAME abc /XYZ/");
+      assert(null != result && result.level == "1" && result.tag == "NAME" &&
+              result.value == "abc /XYZ/", "UnitTest1", "Unit Test 1");
+      result = GedcomAnalytics.GedcomParser.splitLine("11 NAME abc /XYZ/");
+      assert(null != result && result.level == "11" && result.tag == "NAME" &&
+              result.value == "abc /XYZ/", "UnitTest2", "Unit Test 2");
+      result = GedcomAnalytics.GedcomParser.splitLine("1123455");
+      assert(null == result, "UnitTest3", "Unit Test 3");
+      result = GedcomAnalytics.GedcomParser.splitLine("99 NAME");
+      assert(null != result && result.level == "99" && result.tag == "NAME" &&
+              result.value == "", "UnitTest4", "Unit Test 4");
+      result = GedcomAnalytics.GedcomParser.splitLine("0 @I4@ INDI");
+      assert(null != result && result.level == "0" && result.tag == "INDI" &&
+              result.value == "" && result.xref == "@I4@", "UnitTest5", "Unit Test 5");
+
+      /*
+       * Tree 
+   *   */
+      var temp = {A : 1,B : 2,C : 3, id : 1};
+      var tree = new GedcomAnalytics.Tree();
+      result = tree.addObject(temp);
+      temp = {D : 4,E : 5,F : 6, id : 2};
+      result = tree.addObject(temp);
+      assert(result ==2 && tree.getObjects()[0].A == 1 &&
+              tree.getObjects()[1].F == 6, "UnitTest6", "Unit Test 6");
+      var func = function(o) {if (o.id == 1) {return true;} else {return false;}};
+      result = tree.indexOf(func);
+      assert(result == 0, "UnitTest7", "Unit Test 7");
+      func = function(o) {if (o.id == 2) {return true;} else {return false;}};
+      result = tree.indexOf(func);
+      assert(result == 1, "UnitTest8", "Unit Test 8");
+      func = function(o) {if (o.id == 3) {return true;} else {return false;}};
+      result = tree.indexOf(func);
+      assert(result == -1, "UnitTest9", "Unit Test 9");
+      /*
+       * Tree step up and down
+       * 1 + 2 (parents)
+       *   3 + 7 - 4 - 5 - 6 (sibilings)
+       *     8 - 9 (children of 3 + 7)
+       */
+      tree.clear();
+      var person = {id : 1};
+      result = tree.addObjectAndDefaultNode(person);
+      for (ii = 2; ii < 10; ii++)
+      {
+        person.id = ii;
+        result = tree.addObjectAndDefaultNode(person);
+      }
+      var parents = []; 
+      var spouses = []; spouses.push(1);
+      var children = []; children.push(2); children.push(3); children.push(4); children.push(5);
+      tree.updateNodeAt(0, parents, spouses, children);
+      spouses = []; spouses.push(0);
+      tree.updateNodeAt(1, parents, spouses, children);
+      parents = []; parents.push(0); parents.push(1);
+      spouses = []; spouses.push(6);
+      children = []; children.push(7); children.push(8);
+      tree.updateNodeAt(2, parents, spouses, children);
+      spouses = []; spouses.push(null);
+      
+    </script>
+  </body>
+</html>

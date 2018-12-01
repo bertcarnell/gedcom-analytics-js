@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--
+Copyright 2015 Robert Carnell
+See the included LICENSE file for licensing details
+-->
+<html lang="en">
+  <head>
+    <title>GEDCOM Analytics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+      var changediv = function(){
+        var textFromBox = document.getElementById("inputGedcomFileNameId");
+        document.getElementById("outputDiv").innerHTML = textFromBox.value;
+      };
+      var changeFileDiv = function(){
+        var textFromDialog = document.getElementById("FileDialog");
+        document.getElementById("fileOutputDiv").innerHTML = textFromDialog.value;
+      };
+    </script>
+    
+  </head>
+  <body>
+    <h2>Enter a GEDCOM file name to be parsed</h2>
+    <input id="inputGedcomFileNameId" type="text" name="inputGedcomFileName" value="" size="40" onchange="changediv()" />
+    <div id="outputDiv"></div>
+    <input id="FileDialog" type="file" onchange="changeFileDiv()"/>
+    <div id="fileOutputDiv"></div>
+  </body>
+</html>
